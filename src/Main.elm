@@ -58,12 +58,21 @@ interpret intent model =
     ( model, Cmd.none )
 
 
+-- VIEW
+
+
 view : Model -> Browser.Document Msg
 view ({ route } as model) =
     let
         adopt ( title, content ) =
             { body =
-                [ Element.layout [] content
+                [ Element.layout [ Element.width Element.fill ]
+                    (Element.column
+                        [ Element.height Element.fill
+                        , Element.width Element.fill
+                        ]
+                        content
+                    )
                     |> Html.map Intent
                 ]
             , title = title ++ " - WhiteLabel"
