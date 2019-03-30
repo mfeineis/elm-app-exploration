@@ -1,27 +1,33 @@
-module App.Session exposing (Session, default, init)
+module App.Session exposing (Session, default, login)
 
 import Task
 
 
 type Session
-    = Session SessionData
+    = Authenticated SessionData
+    | Indeterminate
+    | Authenticating
+    | Unauthenticated Int String
 
 
 type alias SessionData =
-    { isValid : Bool
+    {
     }
 
 
 default : Session
 default =
-    Session { isValid = False }
+    Indeterminate
 
 
-init : (Session -> msg) -> Cmd msg
-init toMsg =
+login : (Session -> msg) -> String -> String -> ( Session, Cmd msg )
+login toMsg userName userPassword =
     let
         sessionData =
-            { isValid = True
+            {
             }
     in
-    Task.perform toMsg (Task.succeed (Session sessionData))
+    ( Authenticating
+    , Task.perform toMsg (Task.succeed (Authenticated sessionData))
+    )
+

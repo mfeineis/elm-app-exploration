@@ -9,12 +9,14 @@ import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
 
 type Route
     = Home
+    | Login
 
 
 parser : Parser (Route -> a) a
 parser =
     oneOf
         [ Parser.map Home Parser.top
+        , Parser.map Login (s "login")
 
         --, Parser.map Profile (s "profile" </> Username.urlParser)
         ]
@@ -54,6 +56,9 @@ routeToString page =
             case page of
                 Home ->
                     []
+
+                Login ->
+                    [ "login" ]
 
         --Profile username ->
         --    [ "profile", Username.toString username ]

@@ -1,6 +1,7 @@
 module App.Page.Home exposing (view)
 
 import App exposing (Intent(..))
+import App.Route exposing (Route)
 import App.Session exposing (Session)
 import Browser
 import Element
@@ -24,14 +25,15 @@ import Element.Region as Region
 
 type alias PageModel a =
     { a
-        | session : Session
+        | route : Route
+        , session : Session
     }
 
 
 view : PageModel a -> ( String, List (Element Intent) )
 view model =
     ( "Home"
-    , [ App.header
+    , [ App.header model
       , Element.row
           [ Region.mainContent
           , Background.color (rgb 0.8 0.8 0.8)

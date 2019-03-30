@@ -11,9 +11,11 @@ suite : Test
 suite =
     describe "Route"
         [ testUrl "" Home
+        , testUrl "#login" Login
         ]
 
 
+testUrl : String -> Route -> Test
 testUrl hash expectedRoute =
     test ("Parsing hash '" ++ hash ++ "'") <|
         \() ->

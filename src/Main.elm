@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import App exposing (Intent(..))
 import App.Page.Home as Home
+import App.Page.Login as Login
 import App.Route as Route exposing (Route(..))
 import App.Session as Session exposing (Session)
 import Browser exposing (UrlRequest(..))
@@ -11,30 +12,42 @@ import Html
 import Url exposing (Url)
 
 
-type alias Model =
-    { route : Route
-    , session : Session
-    }
-
-
 type Fact
     = LinkClicked UrlRequest
     | SessionRenewed Session
     | UrlChanged Url
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+type alias Model =
+    -- Login/Registration
+    { loginUserName : String
+    , loginUserPassword : String
+
+    -- General stuff
+    , navKey : Nav.Key
+    , route : Route
+    , session : Session
+    }
 
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url key =
-    ( { route = Home
+init _ url navKey =
+    -- Login/Registration
+    ( { loginUserName = ""
+      , loginUserPassword = ""
+
+      -- General stuff
+      , navKey = navKey
+      , route = Login
       , session = Session.default
       }
-    , Session.init (Fact << SessionRenewed)
+    , Cmd.none
     )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 apply : Fact -> Model -> ( Model, Cmd Msg )
@@ -47,7 +60,9 @@ apply fact model =
             ( { model | route = parseRoute url }, Cmd.none )
 
         SessionRenewed session ->
-            ( { model | session = session }, Cmd.none )
+            ( { model | session = session }
+            , Route.replaceUrl model.navKey Home
+            )
 
         UrlChanged url ->
             ( { model | route = parseRoute url }, Cmd.none )
@@ -55,7 +70,23 @@ apply fact model =
 
 interpret : Intent -> Model -> ( Model, Cmd Msg )
 interpret intent model =
-    ( model, Cmd.none )
+    case intent of
+        EnterUserName it ->
+            ( { model | loginUserName = it }, Cmd.none )
+
+        EnterUserPassword it ->
+            ( { model | loginUserPassword = it }, Cmd.none )
+
+        InitiateLogin ->
+            let
+                ( session, cmd ) =
+                    Session.login
+                        (Fact << SessionRenewed)
+                        model.loginUserName
+                        model.loginUserPassword
+            in
+            ( { model | session = session }, cmd )
+
 
 
 -- VIEW
@@ -81,6 +112,9 @@ view ({ route } as model) =
     case route of
         Home ->
             adopt (Home.view model)
+
+        Login ->
+            adopt (Login.view model)
 
 
 

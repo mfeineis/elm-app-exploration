@@ -1,5 +1,6 @@
 module App exposing (Intent(..), header)
 
+import App.Route exposing (Route)
 import Element exposing (Element, fill, height, px, rgb, width)
 import Element.Background as Background
 import Element.Border as Border
@@ -7,11 +8,19 @@ import Element.Region as Region
 
 
 type Intent
-    = DoNothing
+    = EnterUserName String
+    | EnterUserPassword String
+    | InitiateLogin
 
 
-header : Element Intent
-header =
+type alias HeaderModel a =
+    { a
+        | route : Route
+    }
+
+
+header : HeaderModel a -> Element Intent
+header { route } =
     Element.row
         [ Region.navigation
         , Border.color (rgb 0.2 0.2 0.2)
